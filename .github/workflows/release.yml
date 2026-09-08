@@ -1,0 +1,30 @@
+name: Draft source release
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/ci.yml
+  draft:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Package tested source and create draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_SHA: ${{ github.sha }}
+          RUN_ID: ${{ github.run_id }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir dist
+          git archive --format=zip --output=dist/source.zip "$RELEASE_SHA"
+          (cd dist && sha256sum source.zip > SHA256SUMS)
+          gh release create "snapshot-$RUN_ID" dist/source.zip dist/SHA256SUMS --target "$RELEASE_SHA" --draft --title "Validated source snapshot $RUN_ID" --notes "Source commit: $RELEASE_SHA. CI passed before packaging. Review this draft before publication."
