@@ -27,4 +27,4 @@ Ordinary write failures remove this run's new output directory. Abrupt terminati
 
 CSV apostrophe escaping is not universal formula protection: spreadsheet applications may reinterpret data when importing or re-saving. Prefer the XLSX, which stores supported strings as literal text; do not remove escaping from untrusted CSV data.
 
-Contact: **bdc@virtualagentics.ai**.
+Contact: **bendecock79@gmail.com**.
